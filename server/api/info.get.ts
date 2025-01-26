@@ -1,5 +1,6 @@
 export default defineEventHandler(async (event) => {
-  const url = `http://localhost:1337/api/events?populate=*`;
+  const baseURL = "http://localhost:1337";
+  const url = `${baseURL}/api/events?populate=*`;
 
   const response: { data: any[] } = await $fetch(url, {
     headers: {
@@ -8,15 +9,23 @@ export default defineEventHandler(async (event) => {
   });
   const info = response.data.map((event) => {
     const eventDate = new Date(event.date);
-    const date = eventDate.toISOString().split('T')[0];
-    const time = eventDate.toISOString().split('T')[1].split('.')[0];
+    const date = eventDate.toLocaleDateString('en-IE', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+    const time = eventDate.toLocaleTimeString('en-IE', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
 
     return {
       name: event.name,
       location: event.location,
       date: date,
       time: time,
-      photo: `http://localhost:1337${event.photo.url}`,
+      photo: `${baseURL}${event.photo.url}`,
     };
   });
 
